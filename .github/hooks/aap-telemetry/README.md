@@ -10,14 +10,25 @@ These hooks send Microsoft HVE Core usage to the Intelligence Hub collector
 | `.github/hooks/aap-telemetry.json` | GitHub Copilot CLI and VS Code agent hooks (repository install) |
 | `hooks/hooks.json` | Claude Code plugin install |
 | `.github/hooks/aap-telemetry/hook.mjs` | the hook itself (Node 18+, no dependencies) |
+| `.github/hooks/aap-telemetry/install.mjs` | the one-command installer (`npx`) |
 
 ## Setup
 
 1. Run the IDE setup script from the project's link page in the Intelligence Hub. It sets
    `OTEL_EXPORTER_OTLP_ENDPOINT` and `OTEL_EXPORTER_OTLP_HEADERS` (the `dtl_` token) that the
    hook reads. Without them the hook does nothing.
-2. Install HVE Core from this fork (plugin marketplace pointing at the fork, or copy `.github/`
-   into the repository). The VS Code Marketplace extension cannot carry hooks.
+2. Install the hooks with one command, from the repository root (Node 18+):
+
+   ```bash
+   npx -y github:Ava-Group-OCTO-AIPlatform/hve-core            # this repository + Claude Code (user)
+   npx -y github:Ava-Group-OCTO-AIPlatform/hve-core --repo     # this repository only (commit .github/hooks)
+   npx -y github:Ava-Group-OCTO-AIPlatform/hve-core --user     # Claude Code, every repository
+   npx -y github:Ava-Group-OCTO-AIPlatform/hve-core --uninstall
+   ```
+
+   Or install HVE Core from this fork (plugin marketplace pointing at the fork), or copy
+   `.github/hooks/aap-telemetry.json` and `.github/hooks/aap-telemetry/` into the repository.
+   The VS Code Marketplace extension cannot carry hooks.
 3. Restart the IDE so the hooks and the environment are picked up.
 
 Opt out at any time with `AAP_HVE_TELEMETRY=off`. Failed sends wait in `~/.aap-hve/outbox.jsonl`

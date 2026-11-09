@@ -22,7 +22,7 @@ import { appendFileSync, existsSync, mkdirSync, readFileSync, renameSync, writeF
 import { homedir } from 'node:os';
 import path from 'node:path';
 
-const HOOK_VERSION = '0.1.0';
+const HOOK_VERSION = '0.2.0';
 const CONTRACT = 1;
 const TIMEOUT_MS = 3000;
 const OUTBOX_MAX = 1000;
@@ -94,10 +94,28 @@ async function readStdin() {
   return quietly(() => JSON.parse(Buffer.concat(chunks).toString('utf8') || '{}'), {});
 }
 
-/** Endpoint and headers: the environment first, then ~/.claude/settings.json (where the setup script writes them). */
+/** `export KEY='value'` lines of the Copilot env file the setup script writes on macOS and Linux. */
+function shellEnv(file) {
+  const out = {};
+  const text = quietly(() => readFileSync(file, 'utf8'), '') ?? '';
+  for (const line of text.split('\n')) {
+    const m = /^\s*export\s+([A-Z_][A-Z0-9_]*)=(?:'([^']*)'|"([^"]*)"|(\S*))\s*$/.exec(line);
+    if (m) out[m[1]] = m[2] ?? m[3] ?? m[4] ?? '';
+  }
+  return out;
+}
+
+/**
+ * Endpoint and headers, from where the Intelligence Hub setup script puts them:
+ * the environment (Windows user variables, a shell that sourced the profile),
+ * ~/.claude/settings.json (Claude Code) and ~/.claude/aap-copilot-env.sh
+ * (Copilot on macOS/Linux, which a VS Code opened from the Dock never sources).
+ */
 function exporterConfig() {
-  const settingsEnv = readJson(path.join(homedir(), '.claude', 'settings.json'), {})?.env ?? {};
-  const pick = (key) => process.env[key] || settingsEnv[key] || '';
+  const claudeDir = path.join(homedir(), '.claude');
+  const settingsEnv = readJson(path.join(claudeDir, 'settings.json'), {})?.env ?? {};
+  const copilotEnv = shellEnv(path.join(claudeDir, 'aap-copilot-env.sh'));
+  const pick = (key) => process.env[key] || settingsEnv[key] || copilotEnv[key] || '';
   const endpoint = (pick('AAP_HVE_ENDPOINT') || pick('OTEL_EXPORTER_OTLP_ENDPOINT') || pick('COPILOT_OTEL_ENDPOINT')).replace(/\/+$/, '');
   const headers = {};
   for (const pair of pick('OTEL_EXPORTER_OTLP_HEADERS').split(',')) {
