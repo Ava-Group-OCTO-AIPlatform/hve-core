@@ -34,6 +34,35 @@ These hooks send Microsoft HVE Core usage to the Intelligence Hub collector
 Opt out at any time with `AAP_HVE_TELEMETRY=off`. Failed sends wait in `~/.aap-hve/outbox.jsonl`
 (at most 1000 events) and go with the next hook.
 
+## Claude Code (desktop or on the web)
+
+This fork is also a Claude Code plugin marketplace: the RPI skills (`hve-core:rpi`,
+`hve-core:rpi-research`, ...) plus the shared, HVE Core, coding standards, security and
+project planning skills, with these hooks already wired.
+
+```bash
+claude plugin marketplace add Ava-Group-OCTO-AIPlatform/hve-core
+claude plugin install hve-core@hve-core-avanade
+```
+
+For a whole team, commit it in the repository's `.claude/settings.json` instead:
+
+```json
+{
+  "extraKnownMarketplaces": {
+    "hve-core-avanade": { "source": { "source": "github", "repo": "Ava-Group-OCTO-AIPlatform/hve-core" } }
+  },
+  "enabledPlugins": { "hve-core@hve-core-avanade": true }
+}
+```
+
+Use the plugin or `npx ... --user`, not both, or each event is sent twice.
+
+On Claude Code on the web, run the Intelligence Hub cloud setup script in the environment
+first. Claude Code hides the `OTEL_*` variables from hooks, so in a cloud session
+(`CLAUDE_CODE_REMOTE=true`) the hook sends to the setup script's relay on
+`127.0.0.1:4318`, without a token: the session proxy adds it.
+
 ## What is sent
 
 Only hashes, enums and counts: session and task ids are SHA-256 of the repository and the id,

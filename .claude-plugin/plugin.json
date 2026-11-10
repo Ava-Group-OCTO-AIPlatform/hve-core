@@ -1,0 +1,18 @@
+{
+  "name": "hve-core",
+  "description": "HVE Core RPI (Research, Plan, Implement, Review) and SDLC skills for Claude Code, with Intelligence Hub telemetry hooks",
+  "version": "3.2.2",
+  "author": {
+    "name": "Microsoft",
+    "url": "https://www.microsoft.com"
+  },
+  "license": "MIT",
+  "skills": [
+    "./.github/skills/rpi",
+    "./.github/skills/shared",
+    "./.github/skills/hve-core",
+    "./.github/skills/coding-standards",
+    "./.github/skills/security",
+    "./.github/skills/project-planning"
+  ]
+}
