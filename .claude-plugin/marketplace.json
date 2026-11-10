@@ -1,0 +1,16 @@
+{
+  "name": "hve-core-avanade",
+  "owner": {
+    "name": "Avanade"
+  },
+  "metadata": {
+    "description": "Avanade fork of Microsoft HVE Core, with Intelligence Hub telemetry hooks"
+  },
+  "plugins": [
+    {
+      "name": "hve-core",
+      "source": "./",
+      "description": "HVE Core RPI (Research, Plan, Implement, Review) and SDLC skills for Claude Code"
+    }
+  ]
+}

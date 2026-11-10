@@ -22,7 +22,8 @@ import { appendFileSync, existsSync, mkdirSync, readFileSync, renameSync, writeF
 import { homedir } from 'node:os';
 import path from 'node:path';
 
-const HOOK_VERSION = '0.2.0';
+const HOOK_VERSION = '0.3.0';
+const CLOUD_RELAY = 'http://127.0.0.1:4318';
 const CONTRACT = 1;
 const TIMEOUT_MS = 3000;
 const OUTBOX_MAX = 1000;
@@ -111,19 +112,38 @@ function shellEnv(file) {
  * ~/.claude/settings.json (Claude Code) and ~/.claude/aap-copilot-env.sh
  * (Copilot on macOS/Linux, which a VS Code opened from the Dock never sources).
  */
+/**
+ * Claude Code on the web hides the OTEL_* variables from hooks, so a cloud
+ * session falls back to the relay the Intelligence Hub cloud setup script
+ * starts. Without that relay the send fails and the event waits in the outbox.
+ */
+function cloudRelay() {
+  return process.env.CLAUDE_CODE_REMOTE === 'true' ? CLOUD_RELAY : '';
+}
+
+function isLoopback(endpoint) {
+  const host = quietly(() => new URL(endpoint).hostname, '');
+  return host === '127.0.0.1' || host === 'localhost' || host === '[::1]';
+}
+
 function exporterConfig() {
   const claudeDir = path.join(homedir(), '.claude');
   const settingsEnv = readJson(path.join(claudeDir, 'settings.json'), {})?.env ?? {};
   const copilotEnv = shellEnv(path.join(claudeDir, 'aap-copilot-env.sh'));
   const pick = (key) => process.env[key] || settingsEnv[key] || copilotEnv[key] || '';
-  const endpoint = (pick('AAP_HVE_ENDPOINT') || pick('OTEL_EXPORTER_OTLP_ENDPOINT') || pick('COPILOT_OTEL_ENDPOINT')).replace(/\/+$/, '');
+  const endpoint = (pick('AAP_HVE_ENDPOINT') || pick('OTEL_EXPORTER_OTLP_ENDPOINT') || pick('COPILOT_OTEL_ENDPOINT') || cloudRelay()).replace(/\/+$/, '');
   const headers = {};
   for (const pair of pick('OTEL_EXPORTER_OTLP_HEADERS').split(',')) {
     const at = pair.indexOf('=');
     if (at > 0) headers[decodeURIComponent(pair.slice(0, at).trim())] = decodeURIComponent(pair.slice(at + 1).trim());
   }
   const auth = Object.entries(headers).find(([k]) => k.toLowerCase() === 'authorization')?.[1] ?? '';
-  return endpoint && /^Bearer\s+dtl_/i.test(auth) ? { url: `${endpoint}/v1/logs`, auth } : null;
+  if (!endpoint) return null;
+  if (/^Bearer\s+dtl_/i.test(auth)) return { url: `${endpoint}/v1/logs`, auth };
+  // Claude Code on the web: the Intelligence Hub cloud setup script starts a
+  // relay on 127.0.0.1:4318 and the session proxy adds the token, so the
+  // container holds none. Only a loopback endpoint goes without one.
+  return isLoopback(endpoint) ? { url: `${endpoint}/v1/logs`, auth: '' } : null;
 }
 
 function repositoryOf(cwd) {
@@ -183,7 +203,7 @@ function requestOf(records, resource) {
 async function send(config, body) {
   const res = await fetch(config.url, {
     method: 'POST',
-    headers: { 'content-type': 'application/json', authorization: config.auth },
+    headers: { 'content-type': 'application/json', ...(config.auth ? { authorization: config.auth } : {}) },
     body: JSON.stringify(body),
     signal: AbortSignal.timeout(TIMEOUT_MS),
   });
