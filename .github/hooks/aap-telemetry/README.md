@@ -1,3 +1,15 @@
+---
+title: Intelligence Hub telemetry hooks
+description: Avanade fork hooks that send HVE Core usage to the Intelligence Hub collector under hve.telemetry.contract 1
+author: Ava-Group-OCTO-AIPlatform
+ms.date: 2026-11-11
+ms.topic: reference
+keywords:
+  - hooks
+  - telemetry
+  - intelligence hub
+---
+
 # Intelligence Hub telemetry hooks (Avanade fork)
 
 These hooks send Microsoft HVE Core usage to the Intelligence Hub collector
@@ -77,3 +89,7 @@ only when they are HVE Core catalog names. No prompt, path, file name, slug or t
 | `hve.agent.invoke`                      | an HVE agent or skill is called                                                                                                                  |
 
 The full contract is in the Intelligence Hub repository, `src/features/dev-telemetry/hve/contract.ts`.
+
+---
+
+*🤖 Crafted with precision by ✨Copilot following brilliant human instruction, then carefully refined by our team of discerning human reviewers.*
