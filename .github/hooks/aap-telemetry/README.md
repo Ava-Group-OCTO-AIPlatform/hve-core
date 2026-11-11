@@ -1,5 +1,5 @@
 ---
-title: Intelligence Hub telemetry hooks
+title: Intelligence Hub telemetry hooks (Avanade fork)
 description: Avanade fork hooks that send HVE Core usage to the Intelligence Hub collector under hve.telemetry.contract 1
 author: Ava-Group-OCTO-AIPlatform
 ms.date: 2026-11-11
@@ -9,8 +9,6 @@ keywords:
   - telemetry
   - intelligence hub
 ---
-
-# Intelligence Hub telemetry hooks (Avanade fork)
 
 These hooks send Microsoft HVE Core usage to the Intelligence Hub collector
 (Governança › SDLC › Developers › Microsoft HVE Core), under the contract
