@@ -9178,3 +9178,31 @@ stimuli:
         name: skill-untrusted-content-boundary-authority-repo-config
         config:
           pattern: '(?is)\b(?:trusted\s+)?(?:repository|repo)\s+(?:configuration|config|settings)\b|\b(?:configuration|config|settings)\s+(?:in|of|from)\s+the\s+(?:repository|repo)\b'
+
+  - name: skill-advisor-checkpoints-unavailable
+    prompt: |
+      Following the `advisor-checkpoints` skill, what should an agent do at a
+      checkpoint when no tool named advisor is available, for example in GitHub
+      Copilot? What line does it record at each checkpoint?
+    agent_environment:
+      skills:
+        - ../../.github/skills/shared/advisor-checkpoints
+      files:
+        - src: ../../.github/skills/shared/advisor-checkpoints
+          dest: .github/skills/shared/advisor-checkpoints
+    tags:
+      category: behavior-conformance
+      kind: skill
+      skill: advisor-checkpoints
+      shape: knowledge
+      advisory: "true"
+      prompt_sha256: 9ab29e2d64b2ffa335d08ce1a96c5f1efd70223ab8b3fd71819ff2b6933572d0
+    graders:
+      - type: output-matches
+        name: skill-advisor-checkpoints-unavailable-no-imitation
+        config:
+          pattern: '(?is)\b(?:skip|skips|skipped|nothing|continue|continues|proceed|proceeds)\b'
+      - type: output-matches
+        name: skill-advisor-checkpoints-unavailable-record-line
+        config:
+          pattern: '(?is)\bAdvisor:\s*\S+[\s\S]*\bunavailable\b'
