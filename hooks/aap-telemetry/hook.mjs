@@ -1,10 +1,12 @@
 #!/usr/bin/env node
+// Copyright (c) 2026 Microsoft Corporation. All rights reserved.
+// SPDX-License-Identifier: MIT
 // HVE Core → Intelligence Hub telemetry hook (hve.telemetry.contract = 1).
 //
 //   node hook.mjs <sessionStart|postToolUse|sessionEnd>   (event JSON on stdin)
 //
 // Runs as a GitHub Copilot hook (Copilot CLI and VS Code agent hooks,
-// .github/hooks/aap-telemetry.json) or a Claude Code hook (hooks/hooks.json).
+// .github/hooks/aap-telemetry.json in the repository) or a Claude Code hook (hooks/hooks.json).
 // It never blocks the agent: no output, always exit 0, 3 s network timeout.
 //
 // Sends OTLP/HTTP JSON logs to {OTEL_EXPORTER_OTLP_ENDPOINT}/v1/logs with the
@@ -211,10 +213,37 @@ async function send(config, body) {
   return res.ok || (res.status >= 400 && res.status < 500 && res.status !== 429);
 }
 
+const EVENT_NAME = /^hve\.[a-z_.]{1,60}$/;
+const ATTR_KEY = /^[a-z0-9_.]{1,80}$/;
+const NANOS = /^\d{1,20}$/;
+
+/**
+ * Rebuilds one queued outbox line as a fresh log record, keeping only the shape
+ * this hook writes. The outbox is a local file anyone on the machine can edit,
+ * so a line that is not our own record is dropped rather than sent.
+ */
+function fromOutbox(line) {
+  const raw = quietly(() => JSON.parse(line), null);
+  if (!raw || typeof raw !== 'object') return null;
+  const eventName = typeof raw.eventName === 'string' && EVENT_NAME.test(raw.eventName) ? raw.eventName : null;
+  const timeUnixNano = typeof raw.timeUnixNano === 'string' && NANOS.test(raw.timeUnixNano) ? raw.timeUnixNano : null;
+  if (!eventName || !timeUnixNano || !Array.isArray(raw.attributes)) return null;
+  const attributes = [];
+  for (const a of raw.attributes.slice(0, 40)) {
+    const key = typeof a?.key === 'string' && ATTR_KEY.test(a.key) ? a.key : null;
+    const v = a?.value ?? {};
+    if (!key) continue;
+    if (typeof v.boolValue === 'boolean') attributes.push({ key, value: { boolValue: v.boolValue === true } });
+    else if (Number.isFinite(v.intValue)) attributes.push({ key, value: { intValue: Math.max(0, Math.trunc(Number(v.intValue))) } });
+    else if (typeof v.stringValue === 'string') attributes.push({ key, value: { stringValue: v.stringValue.replace(/[\r\n]/g, ' ').slice(0, 512) } });
+  }
+  return { timeUnixNano, eventName, attributes };
+}
+
 /** Sends the new records plus whatever is queued; on failure everything goes back to the outbox. */
 async function flush(config, resource, records) {
   const outbox = path.join(HOME, 'outbox.jsonl');
-  const queued = quietly(() => readFileSync(outbox, 'utf8').split('\n').filter(Boolean).map((l) => JSON.parse(l)), []);
+  const queued = quietly(() => readFileSync(outbox, 'utf8').split('\n').filter(Boolean).map(fromOutbox).filter(Boolean), []);
   const all = [...queued, ...records].slice(-OUTBOX_MAX);
   if (all.length === 0) return;
   const ok = await send(config, requestOf(all, resource)).catch(() => false);
