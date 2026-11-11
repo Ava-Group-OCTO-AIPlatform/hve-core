@@ -8,3 +8,9 @@ name: HVE Core source analysis
 # /language:javascript-typescript/generated-slides category.
 paths-ignore:
   - 'docs/slides/*.html'
+  # Avanade fork, approved by the project owner on 2026-11-11: the telemetry
+  # hook resends its own offline outbox to the endpoint the developer set up,
+  # which js/file-access-to-http flags. Every queued line is rebuilt from
+  # validated fields first (fromOutbox); hooks/aap-telemetry/hook.test.mjs pins
+  # that. Only hook.mjs is excluded; install.mjs stays in scope.
+  - 'hooks/aap-telemetry/hook.mjs'
