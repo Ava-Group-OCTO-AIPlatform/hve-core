@@ -27,15 +27,15 @@ Run this check once per phase, before the first checkpoint.
 
 Call the advisor at these moments, at most once each per loop iteration. The advisor takes no input: everything it needs is already in the conversation, so make the state it should judge visible first (write the draft artifact, run the check, list the findings).
 
-| Phase | Checkpoint | When |
-|---|---|---|
-| Research (`rpi-research`) | R1 | Before handing off the recommendation, once the alternatives and the selected approach are written |
-| Plan (`rpi-plan`) | P1 | Before handing off the plan, after the plan critique (when one ran) is reconciled |
-| Implement (`rpi-implement`) | I1 | Before the first state-changing edit of the session, after the orientation reads |
-| Implement (`rpi-implement`) | I2 | When the same test, build, or lint check fails twice in a row for the same reason |
-| Implement (`rpi-implement`) | I3 | Before marking the plan complete and handing off to review, once changes and validation results are recorded |
-| Review (`rpi-review`, `code-review`) | V1 | Before stating the verdict, once the findings are listed |
-| Follow-up (rework) | F1 | Before routing review findings back into implementation, to confirm the rework scope |
+| Phase                                | Checkpoint | When                                                                                                         |
+|--------------------------------------|------------|--------------------------------------------------------------------------------------------------------------|
+| Research (`rpi-research`)            | R1         | Before handing off the recommendation, once the alternatives and the selected approach are written           |
+| Plan (`rpi-plan`)                    | P1         | Before handing off the plan, after the plan critique (when one ran) is reconciled                            |
+| Implement (`rpi-implement`)          | I1         | Before the first state-changing edit of the session, after the orientation reads                             |
+| Implement (`rpi-implement`)          | I2         | When the same test, build, or lint check fails twice in a row for the same reason                            |
+| Implement (`rpi-implement`)          | I3         | Before marking the plan complete and handing off to review, once changes and validation results are recorded |
+| Review (`rpi-review`, `code-review`) | V1         | Before stating the verdict, once the findings are listed                                                     |
+| Follow-up (rework)                   | F1         | Before routing review findings back into implementation, to confirm the rework scope                         |
 
 Skip a checkpoint when the step is trivial (a one-line change, a plan with one task, a review with no findings), and say in the phase artifact that it was skipped and why.
 

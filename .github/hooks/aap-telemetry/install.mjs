@@ -1,4 +1,6 @@
 #!/usr/bin/env node
+// Copyright (c) 2026 Microsoft Corporation. All rights reserved.
+// SPDX-License-Identifier: MIT
 // Installs the Intelligence Hub telemetry hooks of this fork (hve.telemetry.contract = 1).
 //
 //   npx -y github:Ava-Group-OCTO-AIPlatform/hve-core            # this repository + Claude Code (user)
@@ -15,7 +17,7 @@
 // It only copies files and edits those two settings: no download, no token.
 // The token comes from the Intelligence Hub IDE setup script (run it first).
 
-import { copyFileSync, existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { copyFileSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { homedir } from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -66,7 +68,11 @@ function installRepo(root) {
   }
   mkdirSync(dir, { recursive: true });
   copyFileSync(HOOK_SOURCE, path.join(dir, 'hook.mjs'));
-  if (existsSync(README_SOURCE)) copyFileSync(README_SOURCE, path.join(dir, 'README.md'));
+  try {
+    copyFileSync(README_SOURCE, path.join(dir, 'README.md'));
+  } catch (error) {
+    if (error?.code !== 'ENOENT') throw error;
+  }
   writeFileSync(config, `${JSON.stringify(copilotHooksJson(), null, 2)}\n`);
   say(`Repository: hooks written to ${path.relative(process.cwd(), config) || config} (commit them so the team has them)`);
 }
@@ -82,10 +88,21 @@ function installUser() {
   const home = path.join(homedir(), '.aap-hve');
   const hook = path.join(home, 'hook.mjs');
   const settingsFile = path.join(homedir(), '.claude', 'settings.json');
+  // Read once and branch on the error, rather than checking existence first:
+  // a separate existence check races with the write below.
   let settings = {};
-  if (existsSync(settingsFile)) {
+  let text = null;
+  try {
+    text = readFileSync(settingsFile, 'utf8');
+  } catch (error) {
+    if (error?.code !== 'ENOENT') {
+      say(`Claude Code: ${settingsFile} could not be read; left untouched.`);
+      return;
+    }
+  }
+  if (text !== null) {
     try {
-      settings = JSON.parse(readFileSync(settingsFile, 'utf8'));
+      settings = JSON.parse(text);
     } catch {
       say(`Claude Code: ${settingsFile} is not valid JSON; left untouched.`);
       return;

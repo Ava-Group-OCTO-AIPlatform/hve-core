@@ -1,0 +1,7 @@
+Governança
+OCTO
+openwiki
+posttooluse
+runsubagent
+sessionend
+sessionstart

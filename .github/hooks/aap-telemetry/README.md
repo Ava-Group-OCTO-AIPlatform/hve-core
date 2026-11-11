@@ -5,12 +5,12 @@ These hooks send Microsoft HVE Core usage to the Intelligence Hub collector
 `hve.telemetry.contract = 1`. They are the only change of this fork against
 `microsoft/hve-core`, kept in their own files so upstream syncs merge cleanly.
 
-| File | Host |
-|---|---|
-| `.github/hooks/aap-telemetry.json` | GitHub Copilot CLI and VS Code agent hooks (repository install) |
-| `hooks/hooks.json` | Claude Code plugin install |
-| `.github/hooks/aap-telemetry/hook.mjs` | the hook itself (Node 18+, no dependencies) |
-| `.github/hooks/aap-telemetry/install.mjs` | the one-command installer (`npx`) |
+| File                                      | Host                                                            |
+|-------------------------------------------|-----------------------------------------------------------------|
+| `.github/hooks/aap-telemetry.json`        | GitHub Copilot CLI and VS Code agent hooks (repository install) |
+| `hooks/hooks.json`                        | Claude Code plugin install                                      |
+| `.github/hooks/aap-telemetry/hook.mjs`    | the hook itself (Node 18+, no dependencies)                     |
+| `.github/hooks/aap-telemetry/install.mjs` | the one-command installer (`npx`)                               |
 
 ## Setup
 
@@ -69,11 +69,11 @@ Only hashes, enums and counts: session and task ids are SHA-256 of the repositor
 cut to 32 hex; artifact kinds come from the `.copilot-tracking/<folder>`; agent and skill names
 only when they are HVE Core catalog names. No prompt, path, file name, slug or text.
 
-| Event | When |
-|---|---|
-| `hve.session.start` / `hve.session.end` | the session starts / ends (duration, end reason) |
-| `hve.artifact.write` | a file is written under `.copilot-tracking/` (kind only) |
-| `hve.rpi.transition` | an RPI state file changes phase or status (mode, blockers, decisions, follow-ups, document counts, plan critique and review run/skipped/pending) |
-| `hve.agent.invoke` | an HVE agent or skill is called |
+| Event                                   | When                                                                                                                                             |
+|-----------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------|
+| `hve.session.start` / `hve.session.end` | the session starts / ends (duration, end reason)                                                                                                 |
+| `hve.artifact.write`                    | a file is written under `.copilot-tracking/` (kind only)                                                                                         |
+| `hve.rpi.transition`                    | an RPI state file changes phase or status (mode, blockers, decisions, follow-ups, document counts, plan critique and review run/skipped/pending) |
+| `hve.agent.invoke`                      | an HVE agent or skill is called                                                                                                                  |
 
 The full contract is in the Intelligence Hub repository, `src/features/dev-telemetry/hve/contract.ts`.

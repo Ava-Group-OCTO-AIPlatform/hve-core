@@ -64,6 +64,10 @@
     {
       "name": "word-stems",
       "path": "./.cspell/word-stems.txt"
+    },
+    {
+      "name": "avanade-fork",
+      "path": "./.cspell/avanade-fork.txt"
     }
   ],
   "dictionaries": [
@@ -78,6 +82,7 @@
     "microsoft-sample-companies",
     "industry-acronyms",
     "general-technical",
+    "avanade-fork",
     "test-fixtures",
     "word-stems"
   ],
