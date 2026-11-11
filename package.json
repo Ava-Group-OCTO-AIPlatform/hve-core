@@ -184,6 +184,6 @@
   "author": "Microsoft",
   "license": "MIT",
   "bin": {
-    "aap-hve-hooks": ".github/hooks/aap-telemetry/install.mjs"
+    "aap-hve-hooks": "hooks/aap-telemetry/install.mjs"
   }
 }

@@ -6,7 +6,7 @@
 //   node hook.mjs <sessionStart|postToolUse|sessionEnd>   (event JSON on stdin)
 //
 // Runs as a GitHub Copilot hook (Copilot CLI and VS Code agent hooks,
-// .github/hooks/aap-telemetry.json) or a Claude Code hook (hooks/hooks.json).
+// .github/hooks/aap-telemetry.json in the repository) or a Claude Code hook (hooks/hooks.json).
 // It never blocks the agent: no output, always exit 0, 3 s network timeout.
 //
 // Sends OTLP/HTTP JSON logs to {OTEL_EXPORTER_OTLP_ENDPOINT}/v1/logs with the

@@ -15,12 +15,15 @@ These hooks send Microsoft HVE Core usage to the Intelligence Hub collector
 `hve.telemetry.contract = 1`. They are the only change of this fork against
 `microsoft/hve-core`, kept in their own files so upstream syncs merge cleanly.
 
-| File                                      | Host                                                            |
-|-------------------------------------------|-----------------------------------------------------------------|
-| `.github/hooks/aap-telemetry.json`        | GitHub Copilot CLI and VS Code agent hooks (repository install) |
-| `hooks/hooks.json`                        | Claude Code plugin install                                      |
-| `.github/hooks/aap-telemetry/hook.mjs`    | the hook itself (Node 18+, no dependencies)                     |
-| `.github/hooks/aap-telemetry/install.mjs` | the one-command installer (`npx`)                               |
+| File                               | Host                                                                                    |
+|------------------------------------|-----------------------------------------------------------------------------------------|
+| `hooks/hooks.json`                 | Claude Code plugin install                                                              |
+| `hooks/aap-telemetry/hook.mjs`     | the hook itself (Node 18+, no dependencies)                                             |
+| `hooks/aap-telemetry/install.mjs`  | the one-command installer (`npx`)                                                       |
+| `.github/hooks/aap-telemetry.json` | written by `--repo` into your repository for GitHub Copilot CLI and VS Code agent hooks |
+
+The sources live under `hooks/` because upstream retired the `.github/hooks/` folder in this
+repository. The installer still writes `.github/hooks/` in your repository, where Copilot reads it.
 
 ## Setup
 
@@ -36,8 +39,9 @@ These hooks send Microsoft HVE Core usage to the Intelligence Hub collector
    npx -y github:Ava-Group-OCTO-AIPlatform/hve-core --uninstall
    ```
 
-   Or install HVE Core from this fork (plugin marketplace pointing at the fork), or copy
-   `.github/hooks/aap-telemetry.json` and `.github/hooks/aap-telemetry/` into the repository.
+   Or install HVE Core from this fork (plugin marketplace pointing at the fork). Without npx,
+   copy `hooks/aap-telemetry/` from this fork to `.github/hooks/aap-telemetry/` in your
+   repository and run `node .github/hooks/aap-telemetry/install.mjs --repo` from its root.
    The VS Code Marketplace extension cannot carry hooks.
 3. Restart the IDE so the hooks and the environment are picked up.
 
