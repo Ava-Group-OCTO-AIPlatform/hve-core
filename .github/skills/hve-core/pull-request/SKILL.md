@@ -75,6 +75,8 @@ Resolve `action` before delegating, then carry this skill's inputs into that ref
 4. Derive the title from the branch and commits. Follow the repository's title convention when one
    exists; otherwise use a concise imperative title. Extract closing issue references only when they
    appear in branch or commit evidence.
+   Then apply the Rework Declaration rules: when the branch fixes, adjusts, or completes a pull request
+   that is already merged, the body declares it.
 5. Build `.copilot-tracking/pr/pr.md`. Use the discovered repository template and preserve its
    heading order, comments, and manual-review checkboxes. If no template exists, copy
    `templates/pull-request.md`. Replace instructional placeholders with verified content while
@@ -169,6 +171,27 @@ and precedence, including required Conventional Commit type and scope, subject s
 signing, or verification rules. Inspect the staged name-status and patch before committing, then verify
 the resulting commit contains only the validated repair delta. Recollect branch context after every
 repair commit because commit evidence, divergence, and push state have changed.
+
+## Rework Declaration
+
+Delivery metrics count rework of merged work from one line in the pull request body
+(Ava-Group-OCTO-AIPlatform fork convention):
+
+```text
+Rework-of: #123 — <one-line reason>
+```
+
+* Add the line when commits, the branch name, the user's request, or a linked issue show that this
+  branch fixes, reverts, adjusts, or completes a pull request already merged into the repository.
+  Confirm the origin is merged and in the same repository; list several origins comma-separated
+  (`Rework-of: #120, #123 — reason`).
+* When the evidence suggests a related merged pull request but does not show that this branch corrects
+  it, ask the user one question ("Does this fix a pull request that is already merged? Which one?")
+  instead of guessing. New work that only builds on earlier work carries no line.
+* Place the line in the template's related-issues section, or at the end of the body when the template
+  has none. Approving the pull request approves the declared rework, so never hide or soften it.
+* A revert created with GitHub's revert button already says `Reverts owner/repo#N`; do not add a second
+  line for the same origin.
 
 ## Description Standard
 

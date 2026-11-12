@@ -15,5 +15,6 @@
 ## Related Issues
 
 {{closing_or_related_issue_reference_or_none}}
+{{rework_of_line_when_this_fixes_a_merged_pull_request}}
 
 <!-- Add Compatibility, Security, Migration, or Follow-up sections only when the branch evidence makes them material. -->
